@@ -8,11 +8,10 @@ from discord import app_commands
 from discord.ext import commands
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Load environment variables from Token.env
 # Token.env is in the root directory
-import sys
-from pathlib import Path
 root_dir = Path(__file__).parent.parent
 load_dotenv(root_dir / 'Token.env')
 
@@ -60,7 +59,7 @@ async def description(interaction: discord.Interaction):
 
 # Run the bot
 if __name__ == "__main__":
-    if not TOKEN or TOKEN == "YOUR_BOT_TOKEN_HERE":
+    if not TOKEN or TOKEN.strip() == "":
         print("Error: Please set your DISCORD_TOKEN in Token.env file")
         exit(1)
     
