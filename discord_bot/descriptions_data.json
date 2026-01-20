@@ -1,0 +1,634 @@
+{
+  "grist": {
+    "name": "Grist",
+    "description": "Grist is the fundamental currency and building material in the Minestuck mod, directly inspired by Homestuck's alchemy system. When enemies are defeated, they drop various types of grist which are stored in the player's grist cache. Each grist type has unique properties including rarity (spawn weight), power value, associated candy item, and underling color.\n\nGrist is used primarily for alchemy at the Alchemiter, where items are created by spending specific grist costs. The grist system is implemented through the GristType class and GristSet API, which manages collections of grist amounts. The GristTypes registry contains all available grist types in the game.\n\nTechnically, grist is handled through the com.mraof.minestuck.api.alchemy package. The GristSet interface provides methods for adding, subtracting, and comparing grist amounts. The system supports both mutable and immutable grist sets, with the DefaultMutableGristSet being the primary implementation used for player grist caches.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/build_gushers.png",
+    "subtopics": {
+      "build": {
+        "name": "Build Grist",
+        "description": "Build Grist is the most common and essential grist type in Minestuck. It has a spawn weight of 1.0 and power value of 1, making it the baseline for all grist calculations. Build grist is dropped by nearly all underlings and is required for almost every alchemy recipe in varying amounts.\n\nThe associated candy item is Build Gushers. Build grist appears as a light blue/teal color and is used extensively in early-game recipes and construction. In the code, it's registered as GRIST_TYPES.register(\"build\", () -> new GristType(new GristType.Properties(1.0F, 1).candy(MSItems.BUILD_GUSHERS))).\n\nTechnical: Spawn Weight: 1.0, Power: 1, Candy: BUILD_GUSHERS",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/build_gushers.png"
+      },
+      "amber": {
+        "name": "Amber Grist",
+        "description": "Amber Grist is a tier 1.5 grist type with moderate rarity. It has a spawn weight of 0.5 and power value of 1.5, making it more valuable than build grist but still relatively common. Amber grist drops from underlings with an orange color scheme (0xe68600).\n\nThe candy form is Amber Gummy Worm. This grist type is commonly used in mid-tier alchemy recipes and appears in recipes for various tools and weapons. Implementation: new GristType(new GristType.Properties(0.5F, 1.5F).candy(MSItems.AMBER_GUMMY_WORM).underlingType(0xe68600)).\n\nTechnical: Spawn Weight: 0.5, Power: 1.5F, Candy: AMBER_GUMMY_WORM, Color: 0xe68600",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/amber_gummy_worm.png"
+      },
+      "caulk": {
+        "name": "Caulk Grist",
+        "description": "Caulk Grist is another tier 1.5 grist with spawn weight 0.5 and power value 1.5. This gray-colored grist (0x797979) is dropped by underlings and used in crafting recipes related to construction and sealing materials.\n\nAssociated with Caulk Pretzel candy, this grist type appears frequently in building-related alchemy recipes. Code implementation: new GristType(new GristType.Properties(0.5F, 1.5F).candy(MSItems.CAULK_PRETZEL).underlingType(0x797979)).\n\nTechnical: Spawn Weight: 0.5, Power: 1.5F, Candy: CAULK_PRETZEL, Color: 0x797979",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/caulk_pretzel.png"
+      },
+      "chalk": {
+        "name": "Chalk Grist",
+        "description": "Chalk Grist is a white-colored grist type (0xebebeb) with tier 1.5 properties (0.5 spawn weight, 1.5 power). It's associated with the Chalk Candy Cigarette and drops from light-colored underlings.\n\nThis grist type is used in recipes involving light or white materials and appears in various tool and weapon crafting recipes throughout the game.\n\nTechnical: Spawn Weight: 0.5, Power: 1.5F, Candy: CHALK_CANDY_CIGARETTE, Color: 0xebebeb",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/chalk_candy_cigarette.png"
+      },
+      "iodine": {
+        "name": "Iodine Grist",
+        "description": "Iodine Grist has a purple tint (0x4f4c79) and maintains tier 1.5 stats with 0.5 spawn weight and 1.5 power value. The candy form is Iodine Licorice, reflecting the medicinal theme.\n\nThis grist is used in alchemy recipes requiring chemical or medicinal components and drops from purple-tinted underlings.\n\nTechnical: Spawn Weight: 0.5, Power: 1.5F, Candy: IODINE_LICORICE, Color: 0x4f4c79",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/iodine_licorice.png"
+      },
+      "shale": {
+        "name": "Shale Grist",
+        "description": "Shale Grist appears in a dark gray color (0x202027) with tier 1.5 statistics. Associated with Shale Peep candy, it drops from dark-colored underlings and is used in stone and mineral-based alchemy recipes.\n\nThe spawn weight of 0.5 and power value of 1.5 place it in the common-to-moderate rarity category.\n\nTechnical: Spawn Weight: 0.5, Power: 1.5F, Candy: SHALE_PEEP, Color: 0x202027",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/shale_peep.png"
+      },
+      "tar": {
+        "name": "Tar Grist",
+        "description": "Tar Grist is the darkest grist type, appearing pure black (0x000000). With tier 1.5 properties, it's associated with Tar Licorice candy and drops from black underlings.\n\nThis grist is often used in dark or void-themed recipes and appears in various weapon and tool crafting formulas.\n\nTechnical: Spawn Weight: 0.5, Power: 1.5F, Candy: TAR_LICORICE, Color: 0x000000",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/tar_licorice.png"
+      },
+      "cobalt": {
+        "name": "Cobalt Grist",
+        "description": "Cobalt Grist is a tier 2 grist with spawn weight 0.4 and power value 2, making it moderately rare and valuable. It appears in a deep blue color (0x0a4bba) and is associated with Cobalt Gum.\n\nCobalt drops from blue-tinted underlings and is commonly used in mid-to-high tier alchemy recipes, especially those involving blue or metal themes.\n\nTechnical: Spawn Weight: 0.4, Power: 2, Candy: COBALT_GUM, Color: 0x0a4bba",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/cobalt_gum.png"
+      },
+      "marble": {
+        "name": "Marble Grist",
+        "description": "Marble Grist is a pristine white grist (0xffffff) at tier 2, with 0.4 spawn weight and power value 2. Associated with Marble Jawbreaker candy, it drops from white underlings.\n\nThis grist is particularly valuable for crafting high-quality items and appears frequently in recipes requiring pure or refined materials. Marble is often dropped by higher-tier underlings including Ogres and Basilisks.\n\nTechnical: Spawn Weight: 0.4, Power: 2, Candy: MARBLE_JAWBREAKER, Color: 0xffffff",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/marble_jawbreaker.png"
+      },
+      "mercury": {
+        "name": "Mercury Grist",
+        "description": "Mercury Grist has a silvery-gray appearance (0xb1adad) and tier 2 properties. The candy form is Mercury Sixlets, and it drops from gray metallic underlings.\n\nWith spawn weight 0.4 and power 2, Mercury is used in recipes involving liquid or metallic properties, often appearing in advanced tool and weapon crafting.\n\nTechnical: Spawn Weight: 0.4, Power: 2, Candy: MERCURY_SIXLETS, Color: 0xb1adad",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/mercury_sixlets.png"
+      },
+      "quartz": {
+        "name": "Quartz Grist",
+        "description": "Quartz Grist appears in a light blue crystalline color (0xd0e1ff) at tier 2. Associated with Quartz Jelly Bean candy, it has 0.4 spawn weight and power value 2.\n\nThis grist drops from crystal or ice-themed underlings and is used in recipes involving transparency, light, or crystalline properties.\n\nTechnical: Spawn Weight: 0.4, Power: 2, Candy: QUARTZ_JELLY_BEAN, Color: 0xd0e1ff",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/quartz_jelly_bean.png"
+      },
+      "sulfur": {
+        "name": "Sulfur Grist",
+        "description": "Sulfur Grist has a bright yellow color (0xe6f62a) and tier 2 stats with 0.4 spawn weight and power 2. The candy form is Sulfur Candy Apple.\n\nSulfur drops from yellow underlings and is commonly used in recipes with explosive, chemical, or bright themes.\n\nTechnical: Spawn Weight: 0.4, Power: 2, Candy: SULFUR_CANDY_APPLE, Color: 0xe6f62a",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/sulfur_candy_apple.png"
+      },
+      "amethyst": {
+        "name": "Amethyst Grist",
+        "description": "Amethyst Grist is a tier 3 grist appearing in purple (0x7c32b4) with spawn weight 0.3 and power value 3. Associated with Amethyst Hard Candy, this is a moderately rare grist type.\n\nAmethyst drops from purple underlings and is used in higher-tier alchemy recipes, particularly those involving magic or mystical themes.\n\nTechnical: Spawn Weight: 0.3, Power: 3, Candy: AMETHYST_HARD_CANDY, Color: 0x7c32b4",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/amethyst_hard_candy.png"
+      },
+      "garnet": {
+        "name": "Garnet Grist",
+        "description": "Garnet Grist has a dark red color (0x831e2d) and tier 3 properties with 0.3 spawn weight and power 3. The candy form is Garnet Twix.\n\nThis grist drops from dark red underlings and appears in advanced crafting recipes, often used for powerful weapons and tools.\n\nTechnical: Spawn Weight: 0.3, Power: 3, Candy: GARNET_TWIX, Color: 0x831e2d",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/garnet_twix.png"
+      },
+      "ruby": {
+        "name": "Ruby Grist",
+        "description": "Ruby Grist is a bright red tier 3 grist (0xfe0127) with spawn weight 0.3 and power value 3. Associated with Ruby Lollipop, it's a valuable grist type.\n\nRuby drops from red underlings and is extensively used in high-tier weapon crafting, particularly for damage-focused items.\n\nTechnical: Spawn Weight: 0.3, Power: 3, Candy: RUBY_LOLLIPOP, Color: 0xfe0127",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/ruby_lollipop.png"
+      },
+      "rust": {
+        "name": "Rust Grist",
+        "description": "Rust Grist appears in a dark rusty red (0x4f0716) at tier 3, with 0.3 spawn weight and power 3. The candy is Rust Gummy Eye.\n\nThis grist type drops from rust-colored underlings and is used in recipes with degradation or corrosion themes.\n\nTechnical: Spawn Weight: 0.3, Power: 3, Candy: RUST_GUMMY_EYE, Color: 0x4f0716",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/rust_gummy_eye.png"
+      },
+      "diamond": {
+        "name": "Diamond Grist",
+        "description": "Diamond Grist is a rare tier 5 grist appearing in brilliant white (0xffffff) with spawn weight 0.2 and power value 5. Associated with Diamond Mint candy, this is one of the most valuable common grist types.\n\nDiamond drops from high-tier underlings and is essential for crafting the most powerful items and tools in the game. Implementation uses the same properties as vanilla diamond tier items.\n\nTechnical: Spawn Weight: 0.2, Power: 5, Candy: DIAMOND_MINT, Color: 0xffffff",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/diamond_mint.png"
+      },
+      "gold": {
+        "name": "Gold Grist",
+        "description": "Gold Grist has a golden yellow color (0xffbf00) and tier 5 stats with 0.2 spawn weight and power 5. The candy form is Gold Candy Ribbon.\n\nGold drops from high-tier golden underlings and is used in expensive alchemy recipes. Despite the same tier as Diamond, gold items in Minecraft typically have lower durability but higher enchantability.\n\nTechnical: Spawn Weight: 0.2, Power: 5, Candy: GOLD_CANDY_RIBBON, Color: 0xffbf00",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/gold_candy_ribbon.png"
+      },
+      "uranium": {
+        "name": "Uranium Grist",
+        "description": "Uranium Grist glows with a radioactive green color (0x14e130) and has tier 5 properties with 0.2 spawn weight and power 5. Associated with Uranium Gummy Bear candy.\n\nThis grist drops from radioactive or high-powered underlings and is used in recipes involving energy, power, or radiation themes. It's particularly common in advanced weapon crafting.\n\nTechnical: Spawn Weight: 0.2, Power: 5, Candy: URANIUM_GUMMY_BEAR, Color: 0x14e130",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/uranium_gummy_bear.png"
+      },
+      "artifact": {
+        "name": "Artifact Grist",
+        "description": "Artifact Grist is a special grist type with spawn weight 0.1 and power value 1, making it extremely rare but not necessarily high-powered. It appears white (0xffffff) and is associated with Artifact Warhead candy.\n\nArtifact grist is used in unique or special recipes and represents ancient or mysterious items. It's the rarest regular grist type in terms of spawn weight.\n\nTechnical: Spawn Weight: 0.1, Power: 1, Candy: ARTIFACT_WARHEAD, Color: 0xffffff",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/artifact_warhead.png"
+      },
+      "zillium": {
+        "name": "Zillium Grist",
+        "description": "Zillium Grist is the ultimate grist type with spawn weight 0.0 and power value 10, making it impossible to obtain from normal underling drops. Associated with Zillium Skittles candy.\n\nZillium must be obtained through special means such as denizen hoards or high-level alchemy. It's used in the most expensive and powerful recipes in the game. The implementation: new GristType(new GristType.Properties(0.0F, 10).candy(MSItems.ZILLIUM_SKITTLES)).\n\nTechnical: Spawn Weight: 0.0, Power: 10, Candy: ZILLIUM_SKITTLES",
+        "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/zillium_skittles.png"
+      }
+    }
+  },
+  "alchemy": {
+    "name": "Alchemy",
+    "description": "Alchemy is the core crafting system in Minestuck, replacing and extending traditional Minecraft crafting. Players use the Alchemiter to create items by spending grist costs, which are determined by recipe files in the data/minestuck/recipe/grist_costs directory. The alchemy system supports two combination modes: AND (&&) and OR (||).\n\nThe AND mode combines two items together, merging their properties and grist costs. The OR mode creates a union of items with different outcomes. Items are prepared using punched cards in the Punch Designix, then combined or totemed using the Totem Lathe before final creation at the Alchemiter.\n\nTechnically, alchemy is implemented through the com.mraof.minestuck.api.alchemy.recipe package. GristCostRecipe handles the calculation of costs, while combination recipes are stored as JSON in combinations/ directory. The system integrates with JEI (Just Enough Items) for recipe viewing through JeiGristCost.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/alchemiter_center.png"
+  },
+  "underlings": {
+    "name": "Underlings",
+    "description": "Underlings are hostile enemies that spawn in the Medium (player lands). They are the primary source of grist and experience in Minestuck. Underling types include Imps (basic enemies), Ogres (stronger variants), Basilisks (flying serpent-like creatures), Giclops (giant cyclops), and Liches (undead spellcasters).\n\nEach underling type has tier-based scaling, with higher tiers having more health, damage, and better grist drops. Underlings spawn based on land properties and player progression, with spawn rates controlled by UnderlingSpawnSettings. The color of underlings often indicates which grist types they drop.\n\nImplementation is in the entity.underling package, with UnderlingEntity as the base class. Each underling has AI goals defined in the ai package, including attack behaviors, movement patterns, and special abilities. Grist drops are handled through GristDropsEvent and calculated based on underling tier and type.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/imp/imp.png"
+  },
+  "consorts": {
+    "name": "Consorts",
+    "description": "Consorts are friendly NPC creatures that live in player lands. They come in several types including salamanders, turtles, iguanas, and nakagators. Consorts provide quests, shops, and world-building dialogue that expands the Homestuck narrative.\n\nPlayers build reputation with consorts through completing quests and trading. Higher reputation unlocks better shop items and more challenging quests with greater rewards. The consort system tracks reputation per player using ConsortReputation and handles rewards through ConsortRewardHandler.\n\nConsorts are implemented in entity.consort package with ConsortEntity as the base class. EnumConsort defines the different consort types. They use custom dialogue system (entity.dialogue) for interactions and have merchant capabilities for trading boondollars and items. Consort spawning is tied to land biomes.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/consort/salamander.png"
+  },
+  "lands": {
+    "name": "Lands",
+    "description": "Lands are procedurally generated dimensions in Minestuck, unique to each player. Each land combines a Terrain type (like forests, desert, or ocean) with an Aspect theme (like time, space, or light), creating diverse environments. For example, 'Land of Wind and Shade' or 'Land of Heat and Clockwork'.\n\nLands feature custom biomes, structures, consorts, underlings, denizen lairs, and gate systems for progression. The terrain affects block generation while the aspect influences color schemes, special features, and storyline elements. Players progress through their land by completing quests and ascending through gates.\n\nImplementation is in world.lands package with LandTypePair combining terrain and aspect. Land generation uses custom worldgen features defined in world.gen and biome generation in world.biome. Each land has unique music tracks, weather patterns, and environmental effects tied to its properties.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/glowing_mushroom.png"
+  },
+  "gates": {
+    "name": "Gates",
+    "description": "Gates are massive stone structures that appear in player lands, serving as progression checkpoints. The First Gate appears above the player's house after entry, with subsequent gates (Second through Seventh) positioned at increasing heights. Each gate leads to a new section of the land or to another player's land in the session chain.\n\nGates must be activated by building up to them, representing vertical progression in the game. The gate system connects all players in a session through a chain, with each player's First Gate leading to the next player's land. The Seventh Gate leads to the player's Denizen and represents the final challenge before achieving the Ultimate Reward.\n\nTechnically, gates are handled through the world.GateHandler class, which manages gate positioning and connections. Gate data is stored per-dimension and synced across server/client through the skaianet package.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/gate.png"
+  },
+  "entry": {
+    "name": "Entry",
+    "description": "Entry is the process of entering the Medium (the game world) from the overworld. This is triggered when a player activates their Cruxtruder, starting a countdown timer. When the timer reaches zero, a meteor destroys the player's overworld location, but the player and nearby area are transported to their personal Land in the Medium.\n\nThe entry process involves several key items: the Cruxtruder (which releases the Kernelsprite and countdown), Totem Lathe (for creating the Cruxite Artifact), Alchemiter (for the entry item), and the Transportalizer. Players must complete entry before the meteor hits or they lose their chance.\n\nImplementation uses the entry package with entry mechanics, and integrates with skaianet for session management. The meteor is an entity that spawns and flies toward the entry point, creating dramatic visual effect before the dimension transfer.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/cruxtruder_base_corner.png"
+  },
+  "echeladder": {
+    "name": "Echeladder",
+    "description": "The Echeladder is Minestuck's progression system, replacing traditional experience levels. As players defeat enemies and complete objectives, they climb rungs on their echeladder, gaining health, damage, and other stat bonuses. Each rung has a unique humorous name inspired by Homestuck.\n\nThe echeladder provides more substantial progression than vanilla Minecraft levels, with each rung granting noticeable power increases. Higher rungs require increasingly more experience and unlock new capabilities. The system tracks progress per-player and persists across deaths.\n\nImplementation is through player data structures with echeladder progression stored in player NBT data. The system hooks into entity damage and death events to calculate experience gains.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/echeladder.png"
+  },
+  "denizens": {
+    "name": "Denizens",
+    "description": "Denizens are powerful boss creatures that inhabit the deepest lairs in each land. Each denizen represents a different challenge and is associated with specific aspects. Defeating or making a deal with your denizen is the final major challenge before completing your land's quest.\n\nDenizens include creatures like Typheus (Breath), Cetus (Light), Hephaestus (Time), and others from Homestuck lore. Each has unique abilities, attack patterns, and represents thematic challenges related to their aspect. Denizens guard treasure hoards containing rare grist including Zillium.\n\nDenizen battles occur in special lairs generated at the seventh gate level. The implementation includes custom boss AI, multiple attack phases, and dialogue systems for the Choice mechanic where players can negotiate instead of fight.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/denizen.png"
+  },
+  "aspects": {
+    "name": "Aspects",
+    "description": "Aspects are fundamental cosmic forces in Homestuck and Minestuck, representing different domains of reality. The twelve aspects are: Time, Space, Breath, Blood, Light, Void, Heart, Mind, Doom, Life, Hope, and Rage. Each aspect influences land generation, abilities, and thematic elements.\n\nIn Minestuck, aspects primarily affect land appearance and storyline. A Space-aspect land might have cosmic themes with stars and galaxies, while a Doom land could feature decay and darkness. Aspects combine with terrain types to create unique land identities.\n\nAspects are implemented in the player and world packages, influencing biome generation, color schemes, and special features. The aspect system integrates with title classes to provide the full Sburb experience.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/aspect_time.png"
+  },
+  "classes": {
+    "name": "Classes",
+    "description": "Classes (or Classpects when combined with Aspects) define a player's role in Sburb. The twelve classes are: Heir, Seer, Knight, Witch, Mage, Page, Rogue, Sylph, Prince, Bard, Thief, and Maid. Each class represents a different approach to manipulating their aspect.\n\nClasses are divided into active and passive types, with each having different relationships to their aspect. For example, Knights wield their aspect as a weapon, while Seers gain knowledge through their aspect. The class system affects abilities and playstyle.\n\nIn code, classes are part of the player title system, influencing god tier abilities and progression. The implementation ties into the player data structures and ability systems.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/class_knight.png"
+  },
+  "god_tiers": {
+    "name": "God Tiers",
+    "description": "God Tier is the ultimate power-up in Minestuck, achieved by dying on your Quest Bed either on Prospit or Derse. Upon god tiering, players gain their class and aspect themed powers, special armor, flight, and conditional immortality. God tier players can only die if their death is Heroic or Just.\n\nThe god tier outfit includes a hood and robes in colors matching the player's aspect, with their class symbol displayed. God tier players gain significant stat boosts, unique abilities based on their classpect, and become key players in defeating powerful enemies.\n\nImplementation includes special armor items with properties defined in MSItemTypes, death handlers that check quest bed conditions, and ability systems. The conditional immortality is handled through damage event hooks that evaluate death circumstances.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/god_tier_pajamas.png"
+  },
+  "quest_beds": {
+    "name": "Quest Beds",
+    "description": "Quest Beds are special slabs found on Prospit and Derse where players can achieve god tier. When a player dies while sleeping on their quest bed, they ascend to god tier instead of dying permanently. Quest beds are personalized to each player and only work for their designated user.\n\nQuest beds glow with the player's aspect color and display their class symbol. They are crucial structures in the dream moon towers. The bed must be in the correct location (Prospit for light aspects, Derse for dark aspects) to function properly.\n\nThe quest bed block is implemented with special NBT data linking it to a player UUID. Death events check if the player died on their quest bed to trigger god tier ascension instead of normal death.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/quest_bed.png"
+  },
+  "strife_specibi": {
+    "name": "Strife Specibi",
+    "description": "Strife Specibi (or Strife Kinds) are weapon categories in Minestuck. Each player allocates their weapons into specibus types like Hammerkind, Bladekind, Riflekind, etc. This system organizes the diverse weapon types and provides thematic consistency to player arsenals.\n\nThe specibus system includes traditional categories (swordkind, axekind) and unique Homestuck weapons (hammerkind, sicklekind, chainsawkind). Each category has multiple tiers and variants with different materials and special properties.\n\nImplementation uses MSItemTypes constants to categorize weapons: HAMMER_TOOL, SWORD_TOOL, AXE_TOOL, KNIFE_TOOL, etc. The weapon builder (WeaponItem.Builder) assigns weapons to these categories, which affects their behavior and abilities.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/claw_hammer.png"
+  },
+  "hammerkind": {
+    "name": "Hammerkind",
+    "description": "Hammerkind is one of the most iconic strife specibi, featuring hammers of all types from basic claw hammers to legendary Zillyhoo. Hammers typically have high damage but slower attack speeds, making them powerful but requiring strategic timing.\n\nNotable hammerkind weapons include the Fear No Anvil, Scarlet Zillyhammer, and various material-tiered hammers. Many hammers have special effects like sweeping attacks or area damage. Hammerkind weapons often have high durability matching their heavy-duty theme.\n\nCode implementation: MSItemTypes.HAMMER_TOOL defines the category. Individual hammers are registered in MSItems.java with properties like new WeaponItem.Builder(tier, damage, speed).set(MSItemTypes.HAMMER_TOOL).",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/sledge_hammer.png"
+  },
+  "bladekind": {
+    "name": "Bladekind / Swordkind",
+    "description": "Bladekind (also called Swordkind) encompasses all sword-type weapons, from basic iron swords to legendary katanas and rapiers. Swords generally have balanced damage and attack speed, making them versatile weapons for any situation.\n\nThe specibus includes katanas, rapiers, broadswords, and unique weapons like the Unbreakable Katana and Caledfwlch. Many blade weapons have special effects such as fire damage, sweeping attacks, or backstab bonuses.\n\nImplementation: MSItemTypes.SWORD_TOOL category with various tier implementations. Swords often use special OnHitEffect additions for abilities like OnHitEffect.backstab or OnHitEffect.setOnFire.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/katana.png"
+  },
+  "sicklekind": {
+    "name": "Sicklekind",
+    "description": "Sicklekind features curved blade weapons including sickles and their larger variants. These weapons typically have moderate damage with good attack speed, and some variants provide harvesting bonuses for crops.\n\nSickles are associated with agricultural themes but can be surprisingly effective in combat. The category bridges farming tools and weapons, with some sickles providing bonuses to plant drops or special attack patterns.\n\nImplementation uses MSItemTypes.SICKLE_TOOL with weapons that may have dual functionality for both combat and utility purposes.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/sickle.png"
+  },
+  "alchemiter": {
+    "name": "Alchemiter",
+    "description": "The Alchemiter is the central machine for creating items in Minestuck. Players insert punched cards or carved totems to create items, spending grist costs from their cache. The Alchemiter is a large multi-block structure with a platform that glows when creating items.\n\nThe machine can create any item that has a grist cost recipe, from simple tools to complex artifacts. The creation process displays particle effects and animation. Players must have sufficient grist in their cache or the recipe will fail.\n\nImplementation includes the blockentity.AlchemiterBlockEntity which handles the actual alchemy logic, checks grist availability, deducts costs, and spawns created items. The structure consists of multiple blocks arranged in a specific pattern.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/alchemiter_center.png"
+  },
+  "cruxtruder": {
+    "name": "Cruxtruder",
+    "description": "The Cruxtruder is the first machine used in Sburb, activated to begin the entry process. When activated, it releases the Kernelsprite, starts the entry countdown, and produces Cruxite Dowels. The dowels are blank until carved with the Totem Lathe.\n\nThe Cruxtruder is a large cylindrical machine with a countdown display showing time until the meteor strike. The lid must be opened to release the kernel. Once activated, it continuously produces cruxite dowels for creating entry items.\n\nImplementation as a multi-block structure with CruxtruderBlockEntity managing countdown timer, kernel release, and dowel production. The countdown syncs across server/client and triggers entry sequence when reaching zero.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/cruxtruder_center.png"
+  },
+  "totem_lathe": {
+    "name": "Totem Lathe",
+    "description": "The Totem Lathe carves cruxite dowels into totems based on punched card patterns. It reads the holes in cards and translates them into the 3D shape of the totem, which represents the item to be created at the Alchemiter.\n\nThe machine allows players to combine cards (AND or OR mode) before carving, enabling item combination alchemy. This is how new and powerful items are discovered by mixing different item codes together.\n\nImplemented with TotemLatheBlockEntity which handles card reading, mode selection (&&/||), pattern combination logic, and totem carving operations. The carved pattern is stored as NBT data in the totem item.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/totem_lathe.png"
+  },
+  "punch_designix": {
+    "name": "Punch Designix",
+    "description": "The Punch Designix creates punched cards from items, encoding the item's data into a hole pattern on the card. These punched cards can then be used in the Totem Lathe to create copies or combinations of items.\n\nEach item has a unique punch pattern. The machine can punch blank cards with any item's pattern, allowing players to store item codes and share them with other players. Cards can be combined before or after punching.\n\nThe PunchDesignixBlockEntity handles item-to-code conversion, card punching operations, and maintains the encoding registry that maps items to their card patterns.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/punch_designix.png"
+  },
+  "kernelsprite": {
+    "name": "Kernelsprite",
+    "description": "The Kernelsprite is a floating orb entity released from the Cruxtruder. Players can prototype the sprite by throwing items or dead creatures into it (up to two prototypings). Prototyping affects all underlings in the session, giving them traits of the prototyped objects.\n\nAfter entry, the sprite becomes the player's guide and advisor, providing information and hints. However, prototyping with powerful creatures makes all underlings stronger and more dangerous, creating a strategic choice.\n\nImplementation as a special entity with prototyping logic that applies traits to the sprite entity and broadcasts to update all underlings. The sprite has AI for following players and providing dialogue.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/kernelsprite.png"
+  },
+  "prospit": {
+    "name": "Prospit",
+    "description": "Prospit is one of two dream moons in the Medium, characterized by its golden yellow color and association with light, prosperity, and creativity. Prospit orbits Skaia and is home to the prospitian dream selves of players with certain aspects.\n\nThe moon features golden cities with tall spires where carapacian citizens live. Players whose dream selves awaken on Prospit are generally associated with active, creative aspects. The White Queen rules Prospit.\n\nProspit is generated as a dimension (world.MSDimensions) with custom structures, golden blocks, and prospitian carapacian spawns. Quest beds for Prospit dreamers are located in the moon's towers.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/yellow_stone_brick.png"
+  },
+  "derse": {
+    "name": "Derse",
+    "description": "Derse is the dark purple dream moon, opposite to Prospit. Associated with darkness, knowledge, and cunning, Derse orbits beyond the Veil and hosts dream selves of players with certain aspects. The Black King rules Derse.\n\nDerse features purple and black architecture with a more ominous aesthetic than Prospit. Dersite dreamers tend toward passive, knowledge-seeking aspects. The moon's society is more secretive and calculating.\n\nImplemented as a dimension with purple/black color scheme, dersite structures, and dersite carapacian spawns. Quest beds for Derse dreamers are in special towers on the moon.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/purple_stone_brick.png"
+  },
+  "skaia": {
+    "name": "Skaia",
+    "description": "Skaia is the massive blue sphere at the center of the Medium, representing creativity, possibility, and the ultimate goal of Sburb. Skaia contains visions of the past, present, and potential futures within its clouds. The Battlefield grows on Skaia's surface.\n\nProspit protects Skaia while Derse seeks to destroy it, creating the eternal conflict at the heart of Sburb. Skaia is passive but immensely powerful, capable of defending itself through paradox space manipulation.\n\nIn code, Skaia is a special dimension or region with unique properties, visual effects showing swirling clouds, and connection to the battlefield structure generation system.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/blue_stone_brick.png"
+  },
+  "battlefield": {
+    "name": "Battlefield",
+    "description": "The Battlefield is a checkered sphere that grows on Skaia's surface, starting as a simple chessboard and expanding with each prototyping. By the end of a session, it becomes a complex planet with varied terrain influenced by all prototypings.\n\nThe battlefield is where the final battle between Prospit and Derse occurs. Its growth represents the increasing complexity and challenge of the session. More prototypings create a larger, more dangerous battlefield.\n\nImplementation generates the battlefield as a structure on Skaia, with size and features tied to the number of prototypings in the session. The checkered pattern remains visible even as terrain complexity increases.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/checkered_stained_glass.png"
+  },
+  "carapacians": {
+    "name": "Carapacians",
+    "description": "Carapacians are chess-themed humanoid NPCs inhabiting Prospit and Derse. They serve their respective kingdoms and include types like Pawns, Rooks, Bishops, Knights, and the royal family (Kings and Queens). Each type has different roles and abilities.\n\nCarapacians can be neutral, friendly, or hostile depending on their kingdom and the player's alignment. They participate in the war between Prospit and Derse, and some become important characters with unique dialogue and quests.\n\nImplemented in entity.carapacian package with different entity types for each rank. They have custom AI for their roles, trading capabilities, and combat behaviors. The White/Black King and Queen are boss-level entities.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/carapacian/white_pawn.png"
+  },
+  "imp": {
+    "name": "Imp",
+    "description": "Imps are the most basic underling type, small impish creatures that spawn frequently in lands. They are the first underlings players encounter and serve as the primary source of basic grist. Imps scale in difficulty based on tier and prototyping.\n\nImps come in various colors indicating their grist drop types. They have simple melee attack patterns but can become dangerous in groups. Higher tier imps have more health and damage, and prototyped imps gain abilities from the kernelsprite.\n\nImpEntity extends UnderlingEntity with basic AI goals for attacking players and wandering. Imp spawning is controlled by land biome and player progression, with spawn rates increasing in certain areas.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/imp/imp.png"
+  },
+  "ogre": {
+    "name": "Ogre",
+    "description": "Ogres are larger, stronger underlings that spawn less frequently than imps but provide better grist rewards. They have more health and damage, requiring better equipment to defeat safely. Ogres represent a mid-game challenge.\n\nOgres use more advanced attack patterns than imps and can pose significant threats to unprepared players. They spawn in deeper parts of lands and near important structures. Higher tier ogres can have special abilities based on prototyping.\n\nOgreEntity has enhanced combat AI with stronger attacks and more health than ImpEntity. They use similar tier-based scaling but with higher base stats.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/ogre/ogre.png"
+  },
+  "basilisk": {
+    "name": "Basilisk",
+    "description": "Basilisks are flying serpentine underlings that swoop down to attack players. They consist of a head and multiple body segments, making them visually impressive and challenging to fight. Basilisks fly through the air and can attack from angles ground enemies cannot.\n\nThese underlings spawn in open areas and sky regions, providing aerial combat challenges. Their segmented body means hitting the head deals more damage than hitting body parts. Basilisks drop valuable grist for their difficulty.\n\nBasiliskEntity is implemented with BasiliskPartEntity for body segments, creating a multi-part entity similar to the Ender Dragon. Flying AI uses pathfinding to swoop at players while maintaining altitude.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/basilisk/basilisk.png"
+  },
+  "giclops": {
+    "name": "Giclops",
+    "description": "Giclops (Giant Cyclops) are massive one-eyed underlings, among the most powerful common underlings. They have enormous health pools and devastating melee attacks. Giclops are late-game challenges that drop large amounts of valuable grist.\n\nThese giants spawn rarely and only in specific land regions. They have reach advantages and can hit multiple players with sweeping attacks. Fighting a Giclops requires good equipment and strategy.\n\nGiclopsEntity has boss-like stats with high health, armor, and damage. Special AI includes ground slam attacks and sweep attacks. They're significantly larger than other underlings, using scaled models.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/giclops/giclops.png"
+  },
+  "lich": {
+    "name": "Lich",
+    "description": "Liches are undead spellcaster underlings that use magic attacks instead of melee. They float above the ground and cast harmful spells at players from range. Liches are dangerous because they can attack while staying out of melee range.\n\nThese underlings spawn in darker areas and crypts. They have moderate health but deadly ranged attacks. Liches can summon other underlings or cast debuffs on players. Fighting them requires ranged weapons or closing distance quickly.\n\nLichEntity uses ranged attack AI with spell casting animations. They have projectile attacks and can teleport short distances to escape melee combat. Implementation includes custom spell effects and particle systems.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/lich/lich.png"
+  },
+  "prototyping": {
+    "name": "Prototyping",
+    "description": "Prototyping is the act of throwing items or entities into the Kernelsprite before entry, fundamentally changing the session. Each prototype affects all underlings in the session, giving them traits, abilities, and appearance elements of the prototyped object.\n\nPlayers can prototype twice per sprite. The first prototyping adds basic traits, while the second adds more complex features. Strategic prototyping can make the game easier or harder. For example, prototyping with a chicken and a sword creates feathered sword-wielding underlings.\n\nThe prototyping system stores prototype data in the sprite entity and broadcasts to all underlings via the event system. UnderlingEntity checks prototype traits and applies visual/gameplay modifications accordingly.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/kernelsprite.png"
+  },
+  "captchalogue": {
+    "name": "Captchalogue",
+    "description": "Captchalogue is the inventory system in Homestuck/Minestuck, using special cards to store items. Players use Sylladex cards to captchalogue (store) items. Different Fetch Modus types organize cards differently, from simple stacks to complex hash maps.\n\nThe captchalogue system adds a unique twist to inventory management. Some modi make accessing items challenging, requiring planning and strategy. Cards can be ejected, traded, or lost, adding risk to item storage.\n\nImplementation would use custom inventory systems and GUI screens, though full fetch modus variety might be simplified in the mod. The basic captchalogue card items exist as a foundation for the system.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/captchalogue_card.png"
+  },
+  "grist_cache": {
+    "name": "Grist Cache",
+    "description": "The Grist Cache is the player's grist storage system, holding all collected grist types and amounts. After entry, the cache becomes accessible through a special interface, showing all grist types and quantities. The cache has unlimited capacity.\n\nGrist automatically goes into the cache when picked up. All players in a session can see their cache contents at any time. The cache interface allows spending grist at alchemy equipment and displays total grist worth.\n\nImplemented as player-specific data stored in save files, with GUI screens for viewing and interacting. The cache syncs between server and client to ensure accurate grist totals during alchemy operations.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/grist_cache.png"
+  },
+  "boondollars": {
+    "name": "Boondollars",
+    "description": "Boondollars are the currency used for trading with consorts. Unlike grist which is for alchemy, boondollars buy items from consort shops. Players earn boondollars through quests, finding treasure, or selling items to consorts.\n\nThe boondollar economy provides a separate progression path from grist. Consort shops sell unique items, quest rewards, and useful supplies. Prices vary based on item rarity and player reputation with consorts.\n\nBoondollar amounts are stored as player data. The BoondollarPriceRecipe and BoondollarPrices classes handle consort trading costs. ConsortEntity has merchant behavior for shop interactions.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/boondollars.png"
+  },
+  "medium": {
+    "name": "The Medium",
+    "description": "The Medium is the dimension containing player lands, Prospit, Derse, Skaia, and the Battlefield. When players enter the game, they're transported from the overworld to their personal land within the Medium. The Medium is the primary play area for Minestuck.\n\nThe Medium is a vast space with each land separated dimensionally but connected through gates and transportalizers. The dream moons orbit within this space, and Skaia sits at the center. All Sburb gameplay occurs within the Medium.\n\nImplemented as multiple dimensions using Minecraft's dimension system (world.MSDimensions). Dynamic dimension creation (DynamicDimensions) generates unique lands per player/session. Dimensions persist in the save file.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/blue_stone_brick.png"
+  },
+  "incipisphere": {
+    "name": "Incipisphere",
+    "description": "The Incipisphere is the complete Sburb session instance, encompassing all connected dimensions: player lands, Prospit, Derse, Skaia, Veil, and Battlefield. It represents the entire game world created when a session begins.\n\nEach Incipisphere is unique to its session and contains all elements needed for that session's completion. The structure and properties of an Incipisphere depend on the number of players, prototypings, and session parameters.\n\nConceptually implemented through the session management system in the skaianet package, which tracks all dimensions, players, and progression in a session.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/incipisphere.png"
+  },
+  "skaianet": {
+    "name": "Skaianet",
+    "description": "Skaianet is the connection and session management system in Minestuck. It handles the server/client relationships between players, manages session creation and progression, and coordinates multiplayer aspects of the game.\n\nThe system tracks which players are connected, who serves whom, and manages the gate chain connecting all players in a session. Skaianet ensures proper session initialization and handles disconnections gracefully.\n\nImplemented in the skaianet package with session data storage, network synchronization, and connection management. The system persists session state and handles both single-player and multiplayer sessions.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/skaianet.png"
+  },
+  "land_aspects": {
+    "name": "Land Aspects",
+    "description": "Land Aspects are the thematic elements that combine with terrain types to create complete lands. Aspects include Time, Space, Light, Void, and others. The aspect influences color schemes, special features, music, and storyline elements of the land.\n\nFor example, a Time aspect land might have clock towers and temporal distortions, while a Light aspect land features bright colors and glowing elements. The aspect also influences denizen type and quest storyline.\n\nImplemented in world.lands package with aspect properties defining colors, special blocks, structure types, and generation parameters. Aspects modify the base terrain generation with thematic overlays.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/aspect_space.png"
+  },
+  "land_terrains": {
+    "name": "Land Terrains",
+    "description": "Land Terrains are the geographical and environmental base of lands. Terrain types include Forest, Desert, Ocean, Frost, Rock, and others. Each terrain defines the basic block palette, biome types, and structural elements.\n\nTerrains provide the physical foundation that aspects theme. A Forest terrain has trees and grass, Desert has sand and cacti, Ocean is water-covered, etc. The terrain affects gameplay difficulty and available resources.\n\nImplemented with terrain classes in world.lands defining block types, biome generation parameters, surface materials, and structure placement rules. Terrains use procedural generation for varied landscapes.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/green_stone.png"
+  },
+  "title_system": {
+    "name": "Title System",
+    "description": "The Title System combines a player's Class and Aspect into their full Sburb title, like 'Knight of Time' or 'Witch of Space'. Titles define playstyle, abilities, and role within the session. Each of the 12 classes can combine with each of the 12 aspects, creating 144 possible titles.\n\nTitles influence god tier powers, quest progression, and narrative role. Some titles are more active (Knights, Princes) while others are passive (Seers, Maids). The title system provides identity and specialization.\n\nImplementation stores title data in player NBT, with class and aspect tracked separately. Title affects ability unlocks, god tier armor appearance, and quest bed locations.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/title.png"
+  },
+  "dream_selves": {
+    "name": "Dream Selves",
+    "description": "Dream Selves are alternate versions of players that exist on either Prospit or Derse. While the player's normal body is in their land, their dream self sleeps on a moon. When one body sleeps, consciousness transfers to the other.\n\nDream selves allow players to explore the moons, interact with carapacians, and view Skaia's clouds. Dream selves can achieve god tier if they die on quest beds. If a dream self dies before god tier, that player loses that aspect of themselves.\n\nImplementation tracks dream self status in player data with synchronization between waking and dreaming states.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/dream_bed.png"
+  },
+  "server_player": {
+    "name": "Server Player",
+    "description": "In Skaianet connections, the Server Player manipulates the Client Player's environment from outside. The server can move objects, deploy alchemy equipment, and help the client through the entry process. This asymmetric co-op is core to Sburb.\n\nServer players use a cursor to interact with the client's world, similar to a god-game interface. They spend build grist to place blocks and machines. Good server/client cooperation is essential for session success.\n\nImplemented through server-side cursor entities (ServerCursorEntity) with special permissions to manipulate client areas.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/server_cursor.png"
+  },
+  "client_player": {
+    "name": "Client Player",
+    "description": "The Client Player is the one being helped through entry by their Server Player. The client explores, fights enemies, and progresses through gates while the server provides support from above.\n\nClients must complete objectives their server sets up, create the entry artifact, and enter before the meteor strikes. After entry, the client/server dynamic shifts to both being active players helping each other.\n\nClient status is tracked in the skaianet connection system with permissions and interaction rules.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/client.png"
+  },
+  "transportalizer": {
+    "name": "Transportalizer",
+    "description": "Transportalizers are teleportation pads that can be linked to create fast-travel networks. Players place two transportalizers and link them using codes. Stepping on one instantly teleports to the linked partner.\n\nThese devices are essential for navigating large lands and creating shortcuts. Multiple transportalizers can form complex networks. The system helps overcome the vast distances in Sburb.\n\nImplemented as block entities storing destination codes, with teleportation handled through entity position manipulation and cross-dimension teleportation support.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/transportalizer.png"
+  },
+  "veil": {
+    "name": "The Veil",
+    "description": "The Veil is the asteroid belt between Prospit and Derse, containing hideouts and secret bases. Some carapacians and exiles live in the Veil. It's a neutral zone in the war between the kingdoms.\n\nThe Veil provides resources and hiding places. In later sessions, it becomes important for certain quest lines. Some powerful items and secrets are hidden in Veil bases.\n\nGenerated as structures within the Medium dimension space, scattered like asteroids with custom generation patterns.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/coarse_stone.png"
+  },
+  "lotus_time_capsule": {
+    "name": "Lotus Time Capsule",
+    "description": "Lotus Time Capsules are mysterious flower entities that appear in sessions, containing items sent from the future or past. Opening a capsule reveals its contents, which can include powerful items, grist, or messages.\n\nThese capsules connect different points in the timeline, enabling stable time loops. Players can create capsules to send items to their past or future selves. The lotus flower aesthetic ties to Skaia's symbolism.\n\nImplemented as LotusFlowerEntity with NBT storage for contents and time data. Opening triggers particle effects and item spawning.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/lotus_flower.png"
+  },
+  "effects": {
+    "name": "Status Effects",
+    "description": "Minestuck adds custom status effects beyond vanilla Minecraft. These include god tier conditional immortality, special weapon effects, and prototyping-based buffs and debuffs.\n\nEffects can come from alchemy items, underling attacks, environmental hazards, or god tier abilities. Some effects are unique to certain classpects or weapons. Understanding effects is crucial for combat strategy.\n\nImplemented in the effects package with custom MobEffect classes registered to the effects registry.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/mob_effect/god_tier.png"
+  },
+  "biomes": {
+    "name": "Land Biomes",
+    "description": "Each land contains multiple custom biomes based on its terrain and aspect. Biomes affect spawns, structures, music, and appearance. Different biomes within a land provide variety and distinct regions.\n\nBiomes can include forests, plains, hills, oceans, and special aspect-themed areas. Biome distribution creates natural exploration goals and different gameplay challenges. Underling spawns vary by biome.\n\nGenerated through world.biome package with custom biome parameters, spawn settings, and feature placement for each land type.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/basic_forest_grass.png"
+  },
+  "structures": {
+    "name": "Land Structures",
+    "description": "Lands contain various generated structures including consort villages, underling hives, ruins, towers, and special aspect-themed buildings. Structures provide points of interest, loot, and challenges.\n\nEach land type has unique structure sets. Consort villages offer quests and trading. Underling hives spawn tougher enemies. Ruins hide treasure. The denizen's lair is the largest and most important structure.\n\nGenerated through world.gen.feature package with structure templates and procedural generation rules.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/glowing_mushroom.png"
+  },
+  "spawn_mechanics": {
+    "name": "Spawning System",
+    "description": "Minestuck's spawning system controls where and when underlings, consorts, and other entities appear. Spawn rates scale with player progression, land depth, and biome type. The system prevents overcrowding while maintaining challenge.\n\nUnderlings spawn more frequently near structures and at lower depths. Consorts spawn in villages and safe areas. Boss entities have special spawn requirements. The system accounts for prototyping effects.\n\nImplemented through UnderlingSpawnSettings and custom spawn rules in entity packages with event-based spawning (UnderlingSpawnListEvent).",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/imp/imp.png"
+  },
+  "blocks": {
+    "name": "Custom Blocks",
+    "description": "Minestuck adds hundreds of custom blocks including machines, decorative blocks, land-specific blocks, and functional blocks. These range from Skaia's checkered stone to aspect-themed blocks unique to each land.\n\nBlocks provide building materials, environmental atmosphere, and functional uses. Some blocks have special properties like glowing mushrooms that provide light, or cruxite that's used in alchemy.\n\nRegistered in block package with properties defined per block type, including hardness, light level, sounds, and special behaviors.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/blue_stone_brick.png"
+  },
+  "fluids": {
+    "name": "Custom Fluids",
+    "description": "Minestuck includes custom fluids like oil, blood, and special land-specific liquids. These fluids have unique properties, colors, and interactions with the environment and entities.\n\nFluids can be hazardous, providing interesting environmental challenges. Some are used in crafting or alchemy. Fluid distribution varies by land terrain and aspect.\n\nImplemented in fluid package with FluidType definitions, block states for fluid blocks, and bucket items for transport.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/oil_still.png"
+  },
+  "music": {
+    "name": "Music System",
+    "description": "Minestuck features extensive custom music for different lands, situations, and areas. Music changes based on biome, dimension (Prospit/Derse/Land), and special events. The soundtrack enhances atmosphere and immersion.\n\nEach land aspect and terrain combination can have unique tracks. Combat music plays during boss fights. Special music plays at important story moments. Music helps players identify where they are.\n\nMusic files are in assets/minestuck/sounds with sound event definitions controlling playback based on context.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/music_disc.png"
+  },
+  "achievements": {
+    "name": "Advancements",
+    "description": "Minestuck adds custom advancements tracking Sburb progression. These include entering the Medium, prototyping, reaching god tier, defeating denizens, and discovering alchemy recipes.\n\nAdvancements guide players through the mod's content and provide goals. They're organized in trees showing progression paths. Completing advancements gives a sense of accomplishment and progress tracking.\n\nDefined in data/minestuck/advancements with trigger criteria, rewards, and display properties. The advancement system uses vanilla advancement framework.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/advancement.png"
+  },
+  "computers": {
+    "name": "Computer System",
+    "description": "Minestuck includes computer blocks that players use to connect with other players in Skaianet. Computers provide the interface for establishing server/client relationships and managing session connections.\n\nThe computer GUI allows selecting other players, sending connection requests, and managing your current connections. Multiple players can chain together in complex server/client networks.\n\nImplemented in computer package with GUI screens, networking packets, and session management integration.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/computer.png"
+  },
+  "atheneum": {
+    "name": "Atheneum",
+    "description": "The Atheneum is a library-like structure containing lore, recipes, and information about Sburb mechanics. It helps players learn about the mod's systems and discover new alchemy possibilities.\n\nBooks in the Atheneum provide hints about progression, explain game mechanics, and show some recipe combinations. It's a useful resource for new players learning the mod.\n\nGenerated as a structure in lands with book content defined in lang files or NBT data.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/bookshelf.png"
+  },
+  "grist_widget": {
+    "name": "Grist Widget",
+    "description": "The Grist Widget is a block that displays grist cache contents and provides nearby access to spending grist. It shows real-time grist amounts and updates when grist is collected or spent.\n\nWidgets can be placed near alchemy stations for easy grist monitoring. They help players track their resources without opening inventory screens constantly.\n\nImplemented as a block entity with display rendering and cache access functionality.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/grist_widget.png"
+  },
+  "sendificator": {
+    "name": "Sendificator",
+    "description": "The Sendificator is a machine that sends items across dimensions or to other players. It's useful for sharing resources, sending gifts, or moving items between lands.\n\nPlayers can configure the sendificator with target coordinates or player names. The machine consumes energy or grist to perform sends. It's essential for multi-player cooperation.\n\nImplemented as a block entity with targeting logic and cross-dimension item transfer capabilities.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/sendificator.png"
+  },
+  "appearifier": {
+    "name": "Appearifier",
+    "description": "The Appearifier retrieves items from the past or future, creating them in the present. This time-bending machine enables temporal item duplication and creates stable time loops.\n\nAppearifying an item that will exist in the future brings it to the present. Appearifying from the past retrieves historical items. This creates causality loops that must be maintained for timeline stability.\n\nImplementation involves complex time logic, item storage, and timeline tracking to prevent paradoxes.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/appearifier.png"
+  },
+  "lunchtop": {
+    "name": "Lunchtop",
+    "description": "The Lunchtop is a portable alchemy device that condenses the functions of larger machines into a laptop-style device. It's useful for on-the-go alchemy in lands.\n\nWhile less powerful than full-sized machines, the Lunchtop provides basic alchemy functionality anywhere. It's especially useful for emergency crafting or when exploring far from base.\n\nImplemented as an item with custom GUI providing simplified alchemy interface.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/lunchtop.png"
+  },
+  "cassettes": {
+    "name": "Cassettes",
+    "description": "Cassettes are music items that can be played in jukeboxes or special blocks. They contain Homestuck-inspired music tracks and collectibles throughout the mod.\n\nDifferent cassettes have different rarities and can be found as loot or purchased from consorts. Collecting all cassettes is an achievement goal. Each cassette has unique cover art.\n\nImplemented as item variants with associated sound events for music playback.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/cassette.png"
+  },
+  "frog_temple": {
+    "name": "Frog Temple",
+    "description": "Frog Temples are special structures in lands housing Frog Entities essential to universe creation. The genesis frog breeding questline involves these temples.\n\nFinding and exploring frog temples reveals lore about universe creation and Skaia's purpose. The temples contain puzzles and rewards for those who understand their significance.\n\nGenerated as special structures with frog entity spawns and alchemy stations for breeding.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/frog_statue.png"
+  },
+  "uranium": {
+    "name": "Uranium Material",
+    "description": "Uranium is a special material tier in Minestuck used for powerful weapons and tools. Uranium items glow green and have special properties like radiation effects on enemies.\n\nUranium tools have good durability and efficiency. Uranium weapons can poison enemies or deal bonus damage. The material is found in lands and used in mid-to-late game gear.\n\nMSItemTypes.URANIUM_TIER defines the material properties with 512 durability and tier 3 mining level.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/uranium_chunk.png"
+  },
+  "emerald_tools": {
+    "name": "Emerald Tools",
+    "description": "Emerald is a tool material tier offering high durability (2000) and tier 4 mining level. Emerald tools are powerful and efficient, surpassing diamond in some aspects.\n\nThese tools are expensive to craft but provide excellent performance. Emerald items are bright green and highly valuable for serious adventurers.\n\nMSItemTypes.EMERALD_TIER with properties: 2000 durability, tier 4, used for high-end tool crafting.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/emerald_pickaxe.png"
+  },
+  "prismarine_tools": {
+    "name": "Prismarine Tools",
+    "description": "Prismarine material tier offers moderate stats with 300 durability and tier 3 mining level. These aquatic-themed tools have bonuses in water.\n\nPrismarine tools mine faster underwater and don't slow down in water. They're ideal for ocean lands or underwater building projects.\n\nMSItemTypes.PRISMARINE_TIER provides ocean-themed tool crafting options.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/prismarine_pickaxe.png"
+  },
+  "corundum": {
+    "name": "Corundum Material",
+    "description": "Corundum is an extremely durable material tier with 2500 durability and tier 5 mining level. It exceeds diamond in durability and matches it in mining capability.\n\nCorundum items are very expensive but incredibly long-lasting. They're among the best non-god-tier equipment available. The material has a crystalline appearance.\n\nMSItemTypes.CORUNDUM_TIER: 2500 durability, tier 5, premium tool material.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/corundum_crystal.png"
+  },
+  "zilly_tools": {
+    "name": "Zilly Material",
+    "description": "Zilly is the ultimate material tier with 5120 durability and tier 7 mining level. Zilly items are the most powerful equipment obtainable, often with special abilities.\n\nFamous weapons like Zillyhoo (legendary hammer) use this material. Zilly items are endgame content requiring massive grist investment. They often have unique colors and particle effects.\n\nMSItemTypes.ZILLY_TIER: 5120 durability, tier 7, ultimate equipment tier.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/zilly_hammer.png"
+  },
+  "denizen_tier": {
+    "name": "Denizen Material",
+    "description": "Denizen tier represents extremely powerful equipment with 4096 durability and tier 6. Items of this tier are drops or rewards from denizen battles.\n\nDenizen items have unique properties themed to the specific denizen they come from. They're among the most powerful non-zilly equipment and represent major achievements.\n\nMSItemTypes.DENIZEN_TIER: 4096 durability, tier 6, denizen-associated items.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/denizen_scales.png"
+  },
+  "candy_tools": {
+    "name": "Candy Material",
+    "description": "Candy is a novelty material tier with 250 durability and tier 2. Candy tools are whimsical weapons and tools made from hardened candy.\n\nThese items have moderate stats and unique aesthetics. Some candy items provide buffs or effects. They're mid-tier options with fun appearances.\n\nMSItemTypes.CANDY_TIER: 250 durability, tier 2, sweet-themed equipment.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/candy_cane.png"
+  },
+  "pogo": {
+    "name": "Pogo Tools",
+    "description": "Pogo items like the Pogo Hammer have special bouncing mechanics. With 1500 durability and tier 3, they're solid mid-game tools with unique movement abilities.\n\nPogo tools grant jump boosts or bouncing effects when used. The Pogo Hammer is particularly famous for its mobility. These items make exploration and combat more dynamic.\n\nMSItemTypes.POGO_TIER with PogoEffect adding special jump mechanics.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/pogo_hammer.png"
+  },
+  "organic_tools": {
+    "name": "Organic Material",
+    "description": "Organic material tier uses organic materials like wood or flesh with 200 durability and tier 2. These tools are early-mid game options with unique themes.\n\nOrganic items might be plant-based, bone-based, or made from other natural materials. They're environmentally themed and renewable.\n\nMSItemTypes.ORGANIC_TIER: 200 durability, tier 2, nature-themed tools.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/organic_stick.png"
+  },
+  "newspaper_tools": {
+    "name": "Paper Material",
+    "description": "Paper/Newspaper tier is a joke material with very low stats (65 durability, tier 1). Paper weapons and tools are novelty items that break quickly.\n\nDespite being weak, paper items have unique charm and some speedrun potential due to being cheap to make. They're mostly for fun.\n\nMSItemTypes.PAPER_TIER: 65 durability, tier 1, weakest material tier.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/newspaper.png"
+  },
+  "sbahj": {
+    "name": "SBAHJ Material",
+    "description": "SBAHJ (Sweet Bro and Hella Jeff) tier is another joke material with 64 durability and tier 1. These items have intentionally poor quality matching the webcomic's aesthetic.\n\nSBAHJ items have hilarious descriptions and terrible stats. They're collectibles and jokes rather than serious equipment. The textures are purposely low-quality.\n\nMSItemTypes.SBAHJ_TIER: 64 durability, tier 1, meme-tier equipment.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/sbahj_poster.png"
+  },
+  "regicide": {
+    "name": "Regicide Questline",
+    "description": "Regicide refers to killing the Black King and/or White King, major boss battles in Sburb. Defeating these monarchs is a significant milestone and often necessary for session completion.\n\nThe Kings are extremely powerful with boss health bars and devastating attacks. They require good gear, strategy, and sometimes cooperation. Victory yields massive grist rewards.\n\nKing entities have special AI with multiple attack phases and abilities.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/carapacian/black_king.png"
+  },
+  "scratch": {
+    "name": "The Scratch",
+    "description": "The Scratch is a session reset mechanic that creates an alternate timeline. If a session becomes unwinnable, players can trigger a Scratch to create a new chance at success.\n\nScratching resets the session with different parameters, potentially creating better conditions. However, it creates timeline complications and shouldn't be used lightly.\n\nImplementation would involve major session state changes and timeline manipulation logic.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/scratch_disk.png"
+  },
+  "ultimate_alchemy": {
+    "name": "Ultimate Alchemy",
+    "description": "Ultimate Alchemy refers to creating the most powerful items through complex combination recipes. This involves mixing multiple high-tier items with specific grist costs to discover legendary equipment.\n\nUltimate alchemy produces items like Zillyhoo, legendary god tier items, and unique artifacts. These recipes require extensive resources and experimentation. Discovery is part of the challenge.\n\nCombination recipes in data/minestuck/recipe/combinations/ define the complex recipe chains.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/alchemiter_center.png"
+  },
+  "jei_integration": {
+    "name": "JEI Integration",
+    "description": "Minestuck integrates with Just Enough Items (JEI) to show grist costs, alchemy recipes, and combination possibilities. This helps players discover recipes without trial and error.\n\nJEI integration displays grist costs for items, shows which items can be combined, and provides recipe viewing. It's essential for learning the alchemy system efficiently.\n\nImplemented in jei package with JeiGristCost and custom recipe category handlers.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/jei_grist_cost.png"
+  },
+  "sburban_jungle": {
+    "name": "Sburban Jungle",
+    "description": "Sburban Jungle is special music track and area theme associated with rapid progression and time shenanigans. The jungle represents chaotic growth and temporal confusion.\n\nAreas with this theme often have time-related mechanics, fast spawns, or unusual environmental effects. The music creates urgency and excitement.\n\nAppears as biome variant in certain Time aspect lands with jungle blocks and rapid entity spawns.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/glowing_log.png"
+  },
+  "horrorterror": {
+    "name": "Horrorterrors",
+    "description": "Horrorterrors are eldritch beings from the Furthest Ring, existing outside normal reality. They represent cosmic horror and void-based powers. Some items and weapons draw power from horrorterrors.\n\nHorrorterror-themed items often have void or dark effects. They're associated with grimdark powers and can be extremely powerful but dangerous. The Horrorterror material tier is high-end.\n\nMSItemTypes.HORRORTERROR_TIER with special OnHitEffect.HORRORTERROR applying dark debuffs.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/entity/horrorterror.png"
+  },
+  "welsh": {
+    "name": "Welsh Material",
+    "description": "Welsh is a special material tier named after Welsh mythology, with 3500 durability and tier 5. It represents Celtic-themed powerful equipment.\n\nWelsh items like the legendary Caledfwlch (Welsh name for Excalibur) are endgame weapons. The material is associated with legendary heroes and epic quests.\n\nMSItemTypes.WELSH_TIER: 3500 durability, tier 5, legendary equipment.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/welsh_stone.png"
+  },
+  "regi": {
+    "name": "Regi Material",
+    "description": "Regi material tier offers 2048 durability and tier 4. Regi items are solid high-tier equipment for late-game progression.\n\nThese items provide reliable performance for challenging content. Regi weapons and tools are upgrades over diamond-tier equipment.\n\nMSItemTypes.REGI_TIER: 2048 durability, tier 4, late-game material.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/regi_stone.png"
+  },
+  "cactus_tools": {
+    "name": "Cactus Material",
+    "description": "Cactus tools use desert materials with 104 durability and tier 2. These spiky tools can damage enemies that hit the wielder.\n\nCactus items are themed around desert survival and defensive properties. They're early-to-mid game options with unique thorns effects.\n\nMSItemTypes.CACTUS_TIER: 104 durability, tier 2, desert-themed tools.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/cactus_cutlass.png"
+  },
+  "book_tools": {
+    "name": "Book Material",
+    "description": "Book material tier represents knowledge-based weapons with 1024 durability and tier 3. Book weapons deal magic damage and have special enchanting properties.\n\nThese items are themed around wisdom and magic. Some provide experience bonuses or enchanting improvements. Ideal for magic-focused builds.\n\nMSItemTypes.BOOK_TIER: 1024 durability, tier 3, knowledge-themed equipment.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/grimoire.png"
+  },
+  "meat_tools": {
+    "name": "Meat Material",
+    "description": "Meat tier uses flesh and bone with 150 durability and tier 2. These grotesque items are biological weapons with unique properties.\n\nMeat tools might restore hunger when used or have health-draining effects. They're thematically disturbing but mechanically interesting.\n\nMSItemTypes.MEAT_TIER: 150 durability, tier 2, flesh-themed tools.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/steak_sword.png"
+  },
+  "ice_tools": {
+    "name": "Ice Material",
+    "description": "Ice tools have 300 durability and tier 3, offering frost-themed abilities. Ice weapons can freeze enemies or create ice blocks.\n\nThese items are ideal for frost lands or players who want cold-based effects. Ice tools provide crowd control through freezing.\n\nMSItemTypes.ICE_TIER: 300 durability, tier 3, frost equipment.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/ice_shard.png"
+  },
+  "battery_tier": {
+    "name": "Battery Material",
+    "description": "Battery tier represents electric/energy weapons with 800 durability and tier 3. Battery items deal shock damage or store energy.\n\nThese technological weapons fit sci-fi themed builds. Some battery items can be recharged instead of repaired.\n\nMSItemTypes.BATTERY_TIER: 800 durability, tier 3, electric tools.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/battery.png"
+  },
+  "knifekind": {
+    "name": "Knifekind",
+    "description": "Knifekind includes daggers, knives, and other small blades. These weapons typically have fast attack speed but lower damage, excelling at rapid strikes.\n\nMany knives have backstab bonuses, dealing extra damage when hitting from behind. Knifekind supports agile, rogue-like playstyles.\n\nMSItemTypes.KNIFE_TOOL with fast attack speeds and special OnHitEffect.backstab mechanics.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/dagger.png"
+  },
+  "axekind": {
+    "name": "Axekind",
+    "description": "Axekind encompasses axes and choppers. These weapons typically have high damage but slower attack speed, making them hit-and-run weapons.\n\nAxes can disable shields and deal heavy single-target damage. They're effective against armored enemies. Axekind supports aggressive, high-damage builds.\n\nMSItemTypes.AXE_TOOL with shield-disabling capabilities and high damage values.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/katana_axe.png"
+  },
+  "spearkind": {
+    "name": "Lance/Spearkind",
+    "description": "Lances and spears offer longer reach than most weapons. They can hit enemies from further away, providing safety at the cost of attack speed.\n\nSpear weapons excel at mounted combat or keeping distance from dangerous enemies. The extended reach changes combat tactics significantly.\n\nMSItemTypes.LANCE_TOOL with extended attack range and unique attack patterns.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/lance.png"
+  },
+  "clubkind": {
+    "name": "Clubkind",
+    "description": "Clubkind includes clubs, bats, and blunt weapons. These weapons knock back enemies and can stun with heavy impacts.\n\nClubs are simple but effective, dealing solid damage with good knockback. They're great for crowd control and keeping enemies at bay.\n\nMSItemTypes.CLUB_TOOL with enhanced knockback and stun effects.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/deuce_club.png"
+  },
+  "battonkind": {
+    "name": "Battonkind",
+    "description": "Battons (batons) are quick-striking weapons between clubs and swords. They offer balanced stats with rapid combo potential.\n\nBattons support technical playstyles with precise timing. They're versatile weapons suitable for various combat situations.\n\nMSItemTypes.BATON_TOOL with balanced attack speed and damage.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/baton.png"
+  },
+  "riflekind": {
+    "name": "Riflekind",
+    "description": "Riflekind represents ranged weapons and guns (if implemented). These would provide long-range combat options.\n\nRanged weapons let players attack from safety, changing combat dynamics. Implementation might use projectile systems or special mechanics.\n\nMay use custom ranged weapon systems or integrate with vanilla bow mechanics.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/rifle.png"
+  },
+  "chainsawkind": {
+    "name": "Chainsawkind",
+    "description": "Chainsaws are powerful rapid-damage weapons that deal continuous damage while active. They're loud, destructive, and effective against all enemy types.\n\nChainsaws can also cut through wood blocks rapidly, serving dual purpose as tools and weapons. They use fuel or durability for continuous operation.\n\nMSItemTypes.CHAINSAW_TOOL with rapid attack rate and block-cutting efficiency.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/chainsaw.png"
+  },
+  "fankind": {
+    "name": "Fankind",
+    "description": "Fans are unique weapons that create wind effects and knock back enemies. Some fans can deflect projectiles or create air currents.\n\nFan weapons support defensive and utility playstyles. They're effective for crowd control and environmental manipulation.\n\nMSItemTypes.FAN_TOOL with wind-based special effects and projectile deflection.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/fan.png"
+  },
+  "scythekind": {
+    "name": "Scythekind",
+    "description": "Scythes are large curved blade weapons associated with death and harvest. They have sweeping attacks hitting multiple enemies and can harvest crops.\n\nScythes are dramatic weapons with area-of-effect potential. They're ideal for players who want to channel grim reaper aesthetics.\n\nMSItemTypes.SCYTHE_TOOL with sweeping attack patterns and harvest bonuses.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/scythe.png"
+  },
+  "clawkind": {
+    "name": "Clawkind",
+    "description": "Claws are fast dual-wielding style weapons with rapid attacks. They have lower individual damage but attack very quickly, racking up hits.\n\nClaws excel at applying hit-based effects like poison or bleeding. They support aggressive melee builds focused on attack speed.\n\nMSItemTypes.CLAWS_TOOL with very fast attack speeds and combo potential.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/claws.png"
+  },
+  "misctool": {
+    "name": "Misc Tools",
+    "description": "Miscellaneous tools include unique weapons that don't fit standard categories. These might include magic items, gadgets, or special equipment.\n\nMisc tools offer unique mechanics and playstyles not available in standard categories. They're for experimental or specialized builds.\n\nMSItemTypes.MISC_TOOL for unique one-of-a-kind weapons.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/misc_tool.png"
+  },
+  "armor_types": {
+    "name": "Armor System",
+    "description": "Minestuck features various armor types beyond vanilla, including god tier outfits, protyping-affected armor, and special material armors. Each set provides different protection and bonuses.\n\nArmor can have special effects, aspect themes, or god tier powers. Some armor provides flight, others give stat bonuses or special abilities.\n\nImplemented through ArmorItem and MSArmorItem classes with custom properties and effects.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/iron_lass_glasses.png"
+  },
+  "food_items": {
+    "name": "Food System",
+    "description": "Minestuck adds numerous food items including grist candy variants, consort foods, and special edibles. Each grist type has a candy form that can be eaten.\n\nFoods provide nutrition and sometimes special effects. Grist candies are edible forms of grist. Consort cuisine offers variety and trading opportunities.\n\nFood items use vanilla food properties with custom nutrition values and effects.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/build_gushers.png"
+  },
+  "cruxite": {
+    "name": "Cruxite",
+    "description": "Cruxite is the special material used to create dowels, which are then carved and alchemized. Raw cruxite appears in lands and can be mined for alchemy materials.\n\nCruxite comes in different colors matching player aspects or found naturally. It's essential for the entire alchemy process, serving as the physical medium for encoded items.\n\nCruxite blocks and items are central to the alchemy machine chain.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/block/cruxite_block.png"
+  },
+  "special_items": {
+    "name": "Special Items",
+    "description": "Minestuck includes many unique special items like Perfectly Generic Objects, Zilly Lollipops, Magic Cue Balls, and other Homestuck references. These items often have unique properties or uses.\n\nSpecial items might be quest objectives, powerful artifacts, or joke items. They add flavor and references to the comic. Some are extremely rare collectibles.\n\nImplemented as unique item instances with special NBT data or behaviors.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/perfectly_generic_object.png"
+  },
+  "bugs": {
+    "name": "Debug Commands",
+    "description": "Minestuck likely includes debug commands for testing and development. These commands can spawn entities, give grist, manipulate session state, or teleport.\n\nDebug tools help developers test mechanics and help players troubleshoot issues. They're typically admin-only or cheat-enabled commands.\n\nImplemented in command package with permission-restricted commands.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/debug.png"
+  },
+  "config": {
+    "name": "Configuration",
+    "description": "MinestuckConfig provides settings to customize the mod experience. Players can adjust difficulty, spawn rates, grist multipliers, and other gameplay parameters.\n\nConfiguration allows tailoring the mod to different playstyles and server needs. Settings persist across game sessions and can be edited in-game or via config files.\n\nImplemented in MinestuckConfig.java with various configuration categories and values.",
+    "image_url": "https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/gui/config.png"
+  }
+}
