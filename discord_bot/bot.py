@@ -27,6 +27,9 @@ intents.message_content = True
 # Default max stack size in Minecraft
 DEFAULT_STACK_SIZE = 64
 
+# Base URL for item images (can be overridden via environment variable)
+ITEM_IMAGE_BASE_URL = os.getenv('ITEM_IMAGE_BASE_URL', 'https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item')
+
 # Create bot instance
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -118,8 +121,8 @@ async def item(interaction: discord.Interaction, item: str):
 
     # Add item image as thumbnail
     # Images are stored in the GitHub repository
-    # Pattern: src/main/resources/assets/minestuck/textures/item/{item_id}.png
-    image_url = f"https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/{item}.png"
+    # Can be overridden with ITEM_IMAGE_BASE_URL environment variable
+    image_url = f"{ITEM_IMAGE_BASE_URL}/{item}.png"
     embed.set_thumbnail(url=image_url)
 
     # Add item type
