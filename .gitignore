@@ -16,3 +16,19 @@
 /.metadata
 /logs/
 java_pid29320.hprof
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+*.egg-info/
+dist/
+
+# Discord Bot Token
+Token.env
