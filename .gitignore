@@ -34,4 +34,4 @@ dist/
 Token.env
 
 # Items Data JSON
-items_data.json
+/discord_bot/items_data.json
