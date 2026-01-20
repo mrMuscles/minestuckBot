@@ -30,6 +30,9 @@ DEFAULT_STACK_SIZE = 64
 # Base URL for item images (can be overridden via environment variable)
 ITEM_IMAGE_BASE_URL = os.getenv('ITEM_IMAGE_BASE_URL', 'https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item')
 
+# Maximum number of subtopics to display in description command
+MAX_SUBTOPICS_DISPLAY = 10
+
 # Create bot instance
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -43,6 +46,17 @@ if items_file.exists():
 else:
     print(f"Warning: items_data.json not found at {items_file}")
     print("Run parse_items.py to generate the items database")
+
+# Load descriptions data
+DESCRIPTIONS_DATA = {}
+descriptions_file = Path(__file__).parent / 'descriptions_data.json'
+if descriptions_file.exists():
+    with open(descriptions_file, 'r', encoding='utf-8') as f:
+        DESCRIPTIONS_DATA = json.load(f)
+    print(f"Loaded {len(DESCRIPTIONS_DATA)} description topics from descriptions_data.json")
+else:
+    print(f"Warning: descriptions_data.json not found at {descriptions_file}")
+    print("Run parse_descriptions.py to generate the descriptions database")
 
 # Event: Bot is ready
 @bot.event
@@ -220,11 +234,164 @@ async def item(interaction: discord.Interaction, item: str):
     # Update the message with the embed
     await interaction.edit_original_response(content=None, embed=embed)
 
-# Command: /description - Replies with "Description Of Object!"
-@bot.tree.command(name="description", description="Get description of an object")
-async def description(interaction: discord.Interaction):
-    """Replies with 'Description Of Object!'"""
-    await interaction.response.send_message("Description Of Object!")
+# Autocomplete function for description topics
+async def topic_autocomplete(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+    """
+    Autocomplete function for description topics.
+    Returns top 25 topics that match the current input, sorted lexicographically.
+    """
+    current_lower = current.lower()
+    
+    # Filter topics that match the input (both main topics and subtopics)
+    matching_topics = []
+    for topic_id, topic_data in DESCRIPTIONS_DATA.items():
+        topic_name = topic_data.get('name', topic_id)
+        if current_lower in topic_name.lower() or current_lower in topic_id.lower():
+            matching_topics.append((topic_name, topic_id))
+        
+        # Also check subtopics
+        subtopics = topic_data.get('subtopics', {})
+        for subtopic_id, subtopic_data in subtopics.items():
+            subtopic_name = subtopic_data.get('name', subtopic_id)
+            full_name = f"{topic_name} - {subtopic_name}"
+            full_id = f"{topic_id}:{subtopic_id}"
+            if current_lower in subtopic_name.lower() or current_lower in subtopic_id.lower():
+                matching_topics.append((full_name, full_id))
+    
+    # Sort lexicographically by name
+    matching_topics.sort(key=lambda x: x[0].lower())
+    
+    # Return top 25 matches with smart truncation
+    choices = []
+    for name, topic_id in matching_topics[:25]:
+        if len(name) > 100:
+            # Smart truncation at word boundary
+            truncated = name[:97].rsplit(' ', 1)[0] + '...'
+            choices.append(app_commands.Choice(name=truncated, value=topic_id))
+        else:
+            choices.append(app_commands.Choice(name=name, value=topic_id))
+    return choices
+
+
+# Autocomplete function for subtopics
+async def subtopic_autocomplete(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+    """
+    Autocomplete function for subtopics based on the selected topic.
+    """
+    # Get the currently selected topic from the command
+    topic = interaction.namespace.topic
+    if not topic or ':' in topic:
+        return []
+    
+    # Get subtopics for the selected topic
+    topic_data = DESCRIPTIONS_DATA.get(topic, {})
+    subtopics = topic_data.get('subtopics', {})
+    
+    if not subtopics:
+        return []
+    
+    current_lower = current.lower()
+    
+    # Filter subtopics that match
+    matching = []
+    for subtopic_id, subtopic_data in subtopics.items():
+        subtopic_name = subtopic_data.get('name', subtopic_id)
+        if current_lower in subtopic_name.lower() or current_lower in subtopic_id.lower():
+            matching.append((subtopic_name, subtopic_id))
+    
+    # Sort and return
+    matching.sort(key=lambda x: x[0].lower())
+    return [
+        app_commands.Choice(name=name, value=subtopic_id)
+        for name, subtopic_id in matching[:25]
+    ]
+
+
+# Command: /description - Get detailed descriptions about Minestuck mechanics
+@bot.tree.command(name="description", description="Get detailed information about Minestuck game mechanics and systems")
+@app_commands.autocomplete(topic=topic_autocomplete, subtopic=subtopic_autocomplete)
+async def description(interaction: discord.Interaction, topic: str, subtopic: str = None):
+    """
+    Display detailed description about a Minestuck topic.
+    
+    Parameters:
+    -----------
+    topic: str
+        The main topic to describe (autocomplete enabled)
+    subtopic: str, optional
+        Specific subtopic for more detailed information (autocomplete enabled)
+    """
+    # Send initial "loading" message
+    await interaction.response.send_message("📚 Loading Minestuck Encyclopedia...")
+    
+    # Handle topic:subtopic format from autocomplete
+    if ':' in topic:
+        parts = topic.split(':', 1)
+        topic = parts[0]
+        subtopic = parts[1]
+    
+    # Check if topic exists
+    if topic not in DESCRIPTIONS_DATA:
+        await interaction.edit_original_response(content=f"❌ Topic '{topic}' not found in the database.")
+        return
+    
+    topic_data = DESCRIPTIONS_DATA[topic]
+    
+    # If subtopic is specified, show subtopic instead
+    if subtopic:
+        subtopics = topic_data.get('subtopics', {})
+        if subtopic not in subtopics:
+            await interaction.edit_original_response(content=f"❌ Subtopic '{subtopic}' not found under '{topic}'.")
+            return
+        
+        subtopic_data = subtopics[subtopic]
+        display_name = subtopic_data.get('name', subtopic.replace('_', ' ').title())
+        description_text = subtopic_data.get('description', 'No description available.')
+        image_url = subtopic_data.get('image_url', '')
+        
+        # Create embed for subtopic
+        embed = discord.Embed(
+            title=f"📖 {display_name}",
+            description=description_text,
+            color=discord.Color.purple()
+        )
+        
+        if image_url:
+            embed.set_thumbnail(url=image_url)
+        
+        embed.set_footer(text=f"Topic: {topic} → {subtopic}")
+    else:
+        # Show main topic
+        display_name = topic_data.get('name', topic.replace('_', ' ').title())
+        description_text = topic_data.get('description', 'No description available.')
+        image_url = topic_data.get('image_url', '')
+        
+        # Create embed for main topic
+        embed = discord.Embed(
+            title=f"📖 {display_name}",
+            description=description_text,
+            color=discord.Color.blue()
+        )
+        
+        if image_url:
+            embed.set_thumbnail(url=image_url)
+        
+        # Add subtopics field if they exist
+        subtopics = topic_data.get('subtopics', {})
+        if subtopics:
+            subtopic_list = ', '.join([data.get('name', sid) for sid, data in list(subtopics.items())[:MAX_SUBTOPICS_DISPLAY]])
+            if len(subtopics) > MAX_SUBTOPICS_DISPLAY:
+                subtopic_list += f"... and {len(subtopics) - MAX_SUBTOPICS_DISPLAY} more"
+            embed.add_field(
+                name="📑 Related Subtopics",
+                value=subtopic_list,
+                inline=False
+            )
+        
+        embed.set_footer(text=f"Topic ID: {topic}")
+    
+    # Update the message with the embed
+    await interaction.edit_original_response(content=None, embed=embed)
 
 # Run the bot
 if __name__ == "__main__":
