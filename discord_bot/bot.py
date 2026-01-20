@@ -32,18 +32,17 @@ async def on_ready():
     print(f'Bot is in {len(bot.guilds)} guilds')
     print('------')
 
-# Command: /syncapp - Syncs all app commands to Discord
-@bot.tree.command(name="syncapp", description="Sync all app commands to Discord immediately")
-async def syncapp(interaction: discord.Interaction):
-    """Syncs all app commands to Discord"""
-    await interaction.response.defer(ephemeral=True)
+# Sync all app commands on bot startup
+@bot.event
+async def on_ready():
+    print(f'{bot.user} has connected to Discord!')
+    print(f'Bot is in {len(bot.guilds)} guilds')
     try:
         synced = await bot.tree.sync()
-        await interaction.followup.send(f"Synced {len(synced)} commands successfully!", ephemeral=True)
         print(f"Synced {len(synced)} commands")
     except Exception as e:
-        await interaction.followup.send(f"Failed to sync commands: {e}", ephemeral=True)
         print(f"Error syncing commands: {e}")
+    print('------')
 
 # Command: /item - Replies with "Item Get!"
 @bot.tree.command(name="item", description="Get an item")
@@ -62,5 +61,5 @@ if __name__ == "__main__":
     if not TOKEN or TOKEN.strip() == "":
         print("Error: Please set your DISCORD_TOKEN in Token.env file")
         exit(1)
-    
+
     bot.run(TOKEN)
