@@ -246,6 +246,81 @@ def format_item_name(item_key: str) -> str:
     return item_key.replace('_', ' ').title()
 
 
+def parse_grist_costs(grist_costs_dir: Path) -> Dict[str, Dict[str, int]]:
+    """Parse grist cost JSON files."""
+    grist_costs = {}
+    
+    if not grist_costs_dir.exists():
+        print(f"Warning: Grist costs directory not found at {grist_costs_dir}")
+        return grist_costs
+    
+    for json_file in grist_costs_dir.glob('*.json'):
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # Extract item ID from ingredient
+            ingredient = data.get('ingredient', {})
+            item_id = ingredient.get('item', '')
+            
+            # Handle both minecraft and minestuck namespaces
+            if item_id.startswith('minecraft:'):
+                item_id = item_id.replace('minecraft:', '')
+            elif item_id.startswith('minestuck:'):
+                item_id = item_id.replace('minestuck:', '')
+            
+            # Extract grist cost
+            grist_cost = data.get('grist_cost', {})
+            if grist_cost and item_id:
+                # Clean up grist type names
+                cleaned_cost = {}
+                for grist_type, amount in grist_cost.items():
+                    grist_name = grist_type.replace('minestuck:', '').replace('_', ' ').title()
+                    cleaned_cost[grist_name] = amount
+                grist_costs[item_id] = cleaned_cost
+        except Exception as e:
+            print(f"Warning: Error parsing {json_file}: {e}")
+    
+    return grist_costs
+
+
+def parse_alchemy_recipes(combinations_dir: Path) -> Dict[str, Dict[str, Any]]:
+    """Parse alchemy combination recipes."""
+    alchemy_recipes = {}
+    
+    if not combinations_dir.exists():
+        print(f"Warning: Combinations directory not found at {combinations_dir}")
+        return alchemy_recipes
+    
+    for json_file in combinations_dir.glob('*.json'):
+        try:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # Extract output item ID
+            output = data.get('output', '')
+            if output.startswith('minecraft:'):
+                output = output.replace('minecraft:', '')
+            elif output.startswith('minestuck:'):
+                output = output.replace('minestuck:', '')
+            
+            # Extract mode (and/or)
+            mode = data.get('mode', '')
+            
+            if output and mode:
+                if output not in alchemy_recipes:
+                    alchemy_recipes[output] = {'modes': set()}
+                alchemy_recipes[output]['modes'].add(mode)
+        except Exception as e:
+            print(f"Warning: Error parsing {json_file}: {e}")
+    
+    # Convert sets to lists for JSON serialization
+    for item_id in alchemy_recipes:
+        alchemy_recipes[item_id]['modes'] = sorted(list(alchemy_recipes[item_id]['modes']))
+    
+    return alchemy_recipes
+
+
 def main():
     """Main function to parse items and generate JSON."""
     # Path to MSItems.java
@@ -264,12 +339,32 @@ def main():
     
     print(f"Found {len(items)} items")
     
+    # Parse grist costs
+    grist_costs_dir = Path(__file__).parent.parent / 'src' / 'main' / 'generated' / 'resources' / 'data' / 'minestuck' / 'recipe' / 'grist_costs'
+    print(f"\nParsing grist costs from {grist_costs_dir}...")
+    grist_costs = parse_grist_costs(grist_costs_dir)
+    print(f"Found grist costs for {len(grist_costs)} items")
+    
+    # Parse alchemy recipes
+    combinations_dir = Path(__file__).parent.parent / 'src' / 'main' / 'generated' / 'resources' / 'data' / 'minestuck' / 'recipe' / 'combinations'
+    print(f"\nParsing alchemy recipes from {combinations_dir}...")
+    alchemy_recipes = parse_alchemy_recipes(combinations_dir)
+    print(f"Found alchemy recipes for {len(alchemy_recipes)} items")
+    
+    # Add grist costs and alchemy info to items
+    for item_key in items:
+        if item_key in grist_costs:
+            items[item_key]['grist_cost'] = grist_costs[item_key]
+        
+        if item_key in alchemy_recipes:
+            items[item_key]['alchemy_modes'] = alchemy_recipes[item_key]['modes']
+    
     # Save to JSON
     output_file = Path(__file__).parent / 'items_data.json'
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(items, f, indent=2, sort_keys=True)
     
-    print(f"Saved item data to {output_file}")
+    print(f"\nSaved item data to {output_file}")
     
     # Print some statistics
     types = {}
@@ -280,6 +375,12 @@ def main():
     print("\nItem types:")
     for item_type, count in sorted(types.items()):
         print(f"  {item_type}: {count}")
+    
+    # Print grist and alchemy stats
+    items_with_grist = sum(1 for item in items.values() if 'grist_cost' in item)
+    items_with_alchemy = sum(1 for item in items.values() if 'alchemy_modes' in item)
+    print(f"\nItems with grist costs: {items_with_grist}")
+    print(f"Items with alchemy recipes: {items_with_alchemy}")
 
 
 if __name__ == '__main__':
