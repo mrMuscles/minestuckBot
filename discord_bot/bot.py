@@ -47,6 +47,7 @@ async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     print(f'Bot is in {len(bot.guilds)} guilds')
     print('------')
+    await bot.change_presence(activity=discord.Game(name="Minestuck Encyclopedia Service"))
 
 # Sync all app commands on bot startup
 @bot.event
@@ -67,17 +68,17 @@ async def item_autocomplete(interaction: discord.Interaction, current: str) -> L
     Returns top 5 items that match the current input, sorted lexicographically.
     """
     current_lower = current.lower()
-    
+
     # Filter items that match the input
     matching_items = []
     for item_id, item_data in ITEMS_DATA.items():
         item_name = item_data.get('name', item_id)
         if current_lower in item_name.lower() or current_lower in item_id.lower():
             matching_items.append((item_name, item_id))
-    
+
     # Sort lexicographically by name
     matching_items.sort(key=lambda x: x[0].lower())
-    
+
     # Return top 5 matches
     return [
         app_commands.Choice(name=name, value=item_id)
@@ -91,7 +92,7 @@ async def item_autocomplete(interaction: discord.Interaction, current: str) -> L
 async def item(interaction: discord.Interaction, item: str):
     """
     Display detailed information about a Minestuck item.
-    
+
     Parameters:
     -----------
     item: str
@@ -99,31 +100,31 @@ async def item(interaction: discord.Interaction, item: str):
     """
     # Send initial "loading" message
     await interaction.response.send_message("Starting Slime's Enough Items Service...")
-    
+
     # Check if item exists
     if item not in ITEMS_DATA:
         await interaction.edit_original_response(content=f"❌ Item '{item}' not found in the database.")
         return
-    
+
     item_data = ITEMS_DATA[item]
     item_name = item_data.get('name', item.replace('_', ' ').title())
-    
+
     # Create embed
     embed = discord.Embed(
         title=f"📦 {item_name}",
         description=f"Information about **{item_name}**",
         color=discord.Color.blue()
     )
-    
+
     # Add item type
     item_type = item_data.get('type', 'Unknown')
     embed.add_field(name="Type", value=item_type, inline=True)
-    
+
     # Add tier if available
     tier = item_data.get('tier')
     if tier:
         embed.add_field(name="Material/Tier", value=tier, inline=True)
-    
+
     # Add rarity if in attributes
     attributes = item_data.get('attributes', [])
     rarity_attrs = [attr for attr in attributes if 'Rarity' in attr]
@@ -132,7 +133,7 @@ async def item(interaction: discord.Interaction, item: str):
         embed.add_field(name="Rarity", value=rarity, inline=True)
     else:
         embed.add_field(name="Rarity", value="Common", inline=True)
-    
+
     # Combat stats (for weapons)
     attack_damage = item_data.get('attack_damage')
     attack_speed = item_data.get('attack_speed')
@@ -140,46 +141,46 @@ async def item(interaction: discord.Interaction, item: str):
         embed.add_field(name="⚔️ Attack Damage", value=f"{attack_damage}", inline=True)
     if attack_speed is not None:
         embed.add_field(name="⚡ Attack Speed", value=f"{attack_speed}", inline=True)
-    
+
     # Durability
     durability = item_data.get('durability')
     if durability:
         embed.add_field(name="🛡️ Durability", value=f"{durability}", inline=True)
-    
+
     # Efficiency (for tools)
     efficiency = item_data.get('efficiency')
     if efficiency and efficiency > 0:
         embed.add_field(name="⛏️ Efficiency", value=f"{efficiency}", inline=True)
-    
+
     # Max stack size
     stack_attrs = [attr for attr in attributes if 'Max Stack' in attr]
     if stack_attrs:
         embed.add_field(name="📚 Max Stack", value=stack_attrs[0].replace('Max Stack: ', ''), inline=True)
     else:
         embed.add_field(name="📚 Max Stack", value=str(DEFAULT_STACK_SIZE), inline=True)
-    
+
     # Special attributes
     special_attrs = [attr for attr in attributes if 'Rarity' not in attr and 'Max Stack' not in attr]
     if special_attrs:
         # Group into categories
         effects = []
         properties = []
-        
+
         for attr in special_attrs:
             if any(keyword in attr.lower() for keyword in ['effect', 'damage', 'fire', 'poison', 'wither', 'attack', 'backstab']):
                 effects.append(attr)
             else:
                 properties.append(attr)
-        
+
         if effects:
             embed.add_field(name="✨ Special Effects", value='\n'.join(f"• {effect}" for effect in effects), inline=False)
-        
+
         if properties:
             embed.add_field(name="🔧 Properties", value='\n'.join(f"• {prop}" for prop in properties), inline=False)
-    
+
     # Item ID (for reference)
     embed.set_footer(text=f"Item ID: {item}")
-    
+
     # Update the message with the embed
     await interaction.edit_original_response(content=None, embed=embed)
 
