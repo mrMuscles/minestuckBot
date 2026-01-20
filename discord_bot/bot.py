@@ -116,6 +116,12 @@ async def item(interaction: discord.Interaction, item: str):
         color=discord.Color.blue()
     )
 
+    # Add item image as thumbnail
+    # Images are stored in the GitHub repository
+    # Pattern: src/main/resources/assets/minestuck/textures/item/{item_id}.png
+    image_url = f"https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item/{item}.png"
+    embed.set_thumbnail(url=image_url)
+
     # Add item type
     item_type = item_data.get('type', 'Unknown')
     embed.add_field(name="Type", value=item_type, inline=True)
@@ -177,6 +183,33 @@ async def item(interaction: discord.Interaction, item: str):
 
         if properties:
             embed.add_field(name="🔧 Properties", value='\n'.join(f"• {prop}" for prop in properties), inline=False)
+
+    # Grist costs
+    grist_cost = item_data.get('grist_cost')
+    if grist_cost:
+        grist_text = ', '.join(f"{amount} {grist_type}" for grist_type, amount in grist_cost.items())
+        embed.add_field(name="💎 Grist Cost", value=grist_text, inline=False)
+
+    # Alchemy modes
+    alchemy_modes = item_data.get('alchemy_modes')
+    if alchemy_modes:
+        # Format the modes
+        if len(alchemy_modes) == 2:
+            alchemy_text = "Both && and ||"
+        elif len(alchemy_modes) == 1:
+            mode = alchemy_modes[0]
+            if mode == 'and':
+                alchemy_text = "&&"
+            elif mode == 'or':
+                alchemy_text = "||"
+            else:
+                alchemy_text = mode
+        else:
+            alchemy_text = ', '.join(alchemy_modes)
+        embed.add_field(name="⚗️ Alchemy Type", value=alchemy_text, inline=False)
+    elif not grist_cost:
+        # No grist cost and no alchemy - indicate this
+        embed.add_field(name="⚗️ Alchemy", value="No alchemy recipe or grist cost", inline=False)
 
     # Item ID (for reference)
     embed.set_footer(text=f"Item ID: {item}")
