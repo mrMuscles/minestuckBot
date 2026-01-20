@@ -30,6 +30,9 @@ DEFAULT_STACK_SIZE = 64
 # Base URL for item images (can be overridden via environment variable)
 ITEM_IMAGE_BASE_URL = os.getenv('ITEM_IMAGE_BASE_URL', 'https://raw.githubusercontent.com/mrMuscles/minestuckBot/main/src/main/resources/assets/minestuck/textures/item')
 
+# Maximum number of subtopics to display in description command
+MAX_SUBTOPICS_DISPLAY = 10
+
 # Create bot instance
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -258,11 +261,16 @@ async def topic_autocomplete(interaction: discord.Interaction, current: str) -> 
     # Sort lexicographically by name
     matching_topics.sort(key=lambda x: x[0].lower())
     
-    # Return top 25 matches
-    return [
-        app_commands.Choice(name=name[:100], value=topic_id)  # Discord limits choice names to 100 chars
-        for name, topic_id in matching_topics[:25]
-    ]
+    # Return top 25 matches with smart truncation
+    choices = []
+    for name, topic_id in matching_topics[:25]:
+        if len(name) > 100:
+            # Smart truncation at word boundary
+            truncated = name[:97].rsplit(' ', 1)[0] + '...'
+            choices.append(app_commands.Choice(name=truncated, value=topic_id))
+        else:
+            choices.append(app_commands.Choice(name=name, value=topic_id))
+    return choices
 
 
 # Autocomplete function for subtopics
@@ -371,9 +379,9 @@ async def description(interaction: discord.Interaction, topic: str, subtopic: st
         # Add subtopics field if they exist
         subtopics = topic_data.get('subtopics', {})
         if subtopics:
-            subtopic_list = ', '.join([data.get('name', sid) for sid, data in list(subtopics.items())[:10]])
-            if len(subtopics) > 10:
-                subtopic_list += f"... and {len(subtopics) - 10} more"
+            subtopic_list = ', '.join([data.get('name', sid) for sid, data in list(subtopics.items())[:MAX_SUBTOPICS_DISPLAY]])
+            if len(subtopics) > MAX_SUBTOPICS_DISPLAY:
+                subtopic_list += f"... and {len(subtopics) - MAX_SUBTOPICS_DISPLAY} more"
             embed.add_field(
                 name="📑 Related Subtopics",
                 value=subtopic_list,
