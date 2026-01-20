@@ -24,6 +24,9 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.message_content = True
 
+# Default max stack size in Minecraft
+DEFAULT_STACK_SIZE = 64
+
 # Create bot instance
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -133,7 +136,7 @@ async def item(interaction: discord.Interaction, item: str):
     # Combat stats (for weapons)
     attack_damage = item_data.get('attack_damage')
     attack_speed = item_data.get('attack_speed')
-    if attack_damage is not None:
+    if attack_damage is not None and attack_damage >= 0:
         embed.add_field(name="⚔️ Attack Damage", value=f"{attack_damage}", inline=True)
     if attack_speed is not None:
         embed.add_field(name="⚡ Attack Speed", value=f"{attack_speed}", inline=True)
@@ -153,7 +156,7 @@ async def item(interaction: discord.Interaction, item: str):
     if stack_attrs:
         embed.add_field(name="📚 Max Stack", value=stack_attrs[0].replace('Max Stack: ', ''), inline=True)
     else:
-        embed.add_field(name="📚 Max Stack", value="64", inline=True)
+        embed.add_field(name="📚 Max Stack", value=str(DEFAULT_STACK_SIZE), inline=True)
     
     # Special attributes
     special_attrs = [attr for attr in attributes if 'Rarity' not in attr and 'Max Stack' not in attr]

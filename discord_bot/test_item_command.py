@@ -85,9 +85,9 @@ def main():
             print(f"  Attack Damage: {info['attack_damage']}")
         if info['attack_speed'] is not None:
             print(f"  Attack Speed: {info['attack_speed']}")
-        if info['durability']:
+        if info['durability'] is not None:
             print(f"  Durability: {info['durability']}")
-        if info['efficiency']:
+        if info['efficiency'] is not None:
             print(f"  Efficiency: {info['efficiency']}")
         if info['attributes']:
             print(f"  Attributes: {', '.join(info['attributes'])}")
